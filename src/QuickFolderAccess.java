@@ -107,6 +107,9 @@ public class QuickFolderAccess {
 			if (menuItem.getLabel().equalsIgnoreCase(folderName)) {
 				popup.remove(menuItem);
 				config.getFolders().remove(folderName);
+				config.setFavoriteFolderName(null);
+				trayIcon.setToolTip("Open a Folder");
+				saveConfig();
 				break;
 			}
 		}

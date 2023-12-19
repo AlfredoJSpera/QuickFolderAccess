@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.util.List;
 import java.awt.event.MouseAdapter;
@@ -24,7 +23,7 @@ public class QuickFolderAccess {
 	private static SerializedConfigs config = new SerializedConfigs();
 	private static SystemTray tray = SystemTray.getSystemTray();
 	private static TrayIcon trayIcon = null;
-	private static PopupMenu popup = null;
+	private static PopupMenu popup = new PopupMenu();
 
 	public QuickFolderAccess() {
 		// Check if system tray is supported
@@ -47,13 +46,13 @@ public class QuickFolderAccess {
 		}
 
 		// Add default folders
-		initializePopupMenu();
 		trayIcon = new TrayIcon(
 				image,
 				"Open a Folder",
 				popup
 		);
 		trayIcon.setImageAutoSize(true);
+		initializePopupMenu();
 
 		try {
 			tray.add(trayIcon);
@@ -154,14 +153,17 @@ public class QuickFolderAccess {
 		for (Map.Entry<String, String> folder : config.getFolders().entrySet()) {
 			popup.add(createMenuItem(folder.getKey(), folder.getValue()));
 		}
+
+		String favoriteFolderName = config.getFavoriteFolderName();
+		if (favoriteFolderName != null) {
+			setFavoriteFolder(favoriteFolderName);
+		}
 	}
 
 	/**
 	 * Create right click popup menu.
 	 */
 	private void initializePopupMenu() {
-		popup = new PopupMenu();
-
 		MenuItem exit = new MenuItem(EXIT);
 		exit.addActionListener(e -> System.exit(0));
 		popup.add(exit);
@@ -190,10 +192,7 @@ public class QuickFolderAccess {
 	}
 
 	public static void setFavoriteFolder(String name) {
-		trayIcon.setToolTip("Open " + name);
-
-		MouseListener[] mouseListeners = trayIcon.getMouseListeners();
-		for (MouseListener mouseListener : mouseListeners) {
+		for (MouseListener mouseListener : trayIcon.getMouseListeners()) {
 			trayIcon.removeMouseListener(mouseListener);
 		}
 
@@ -208,6 +207,10 @@ public class QuickFolderAccess {
 				}
 			}
 		});
+
+		trayIcon.setToolTip("Open " + name);
+		config.setFavoriteFolderName(name);
+		saveConfig();
 	}
 
 	/**

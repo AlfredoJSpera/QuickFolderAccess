@@ -9,7 +9,7 @@ public class SerializedConfigs implements Serializable {
 	private static final long serialVersionUID = 5089920150690765457L;
 
 	private Map<String, String> folders;
-	private File favoriteFolder = null;
+	private String favoriteFolderName = null;
 
 	public SerializedConfigs() {
 		this.folders = new HashMap<>();
@@ -19,9 +19,9 @@ public class SerializedConfigs implements Serializable {
 		this.folders = folders;
 	}
 
-	public SerializedConfigs(Map<String, String> folders, File favoriteFolder) {
+	public SerializedConfigs(Map<String, String> folders, String favoriteFolder) {
 		this.folders = folders;
-		this.favoriteFolder = favoriteFolder;
+		this.favoriteFolderName = favoriteFolder;
 	}
 
 	public Map<String, String> getFolders() {
@@ -32,19 +32,19 @@ public class SerializedConfigs implements Serializable {
 		this.folders = folders;
 	}
 
-	public File getFavoriteFolder() {
-		return favoriteFolder;
+	public String getFavoriteFolderName() {
+		return favoriteFolderName;
 	}
 
-	public void setFavoriteFolder(File favoriteFolder) {
-		this.favoriteFolder = favoriteFolder;
+	public void setFavoriteFolderName(String favoriteFolderName) {
+		this.favoriteFolderName = favoriteFolderName;
 	}
 
 	@Override
 	public String toString() {
 		return "SerializedConfigs{" +
 				"folders=" + folders +
-				", favoriteFolder=" + favoriteFolder +
+				", favoriteFolder=" + favoriteFolderName +
 				'}';
 	}
 }

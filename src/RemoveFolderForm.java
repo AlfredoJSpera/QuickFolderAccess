@@ -2,35 +2,12 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-class ItemsContainer {
-	private JCheckBox checkBox;
-	private MenuItem menuItem;
-
-	public ItemsContainer(JCheckBox checkBox, MenuItem menuItem) {
-		this.checkBox = checkBox;
-		this.menuItem = menuItem;
-	}
-
-	public JCheckBox getCheckBox() {
-		return checkBox;
-	}
-
-	public void setCheckBox(JCheckBox checkBox) {
-		this.checkBox = checkBox;
-	}
-
-	public MenuItem getMenuItem() {
-		return menuItem;
-	}
-
-	public void setMenuItem(MenuItem menuItem) {
-		this.menuItem = menuItem;
-	}
-}
-
 public class RemoveFolderForm extends JFrame {
+	private static final String[] NAMES_TO_AVOID = {"Exit", "Add Folder...", "Remove Folder...", "-"};
+
 	public RemoveFolderForm(String name) {
 		setTitle(name);
 		setSize(400, 300);
@@ -47,27 +24,26 @@ public class RemoveFolderForm extends JFrame {
 		for (int i = 0; i < popup.getItemCount(); i++) {
 			MenuItem menuItem = popup.getItem(i);
 
-			JCheckBox checkBox = new JCheckBox(menuItem.getLabel());
-
-			checkBoxes.add(checkBox);
+			if (!Arrays.asList(NAMES_TO_AVOID).contains(menuItem.getLabel())) {
+				JCheckBox checkBox = new JCheckBox(menuItem.getLabel());
+				checkBoxes.add(checkBox);
+				panel.add(checkBox);
+			}
 		}
 
+		List<String> namesList = new ArrayList<>();
 		JButton submitButton = new JButton("Remove");
 		submitButton.addActionListener(e -> {
 			for (JCheckBox checkBox : checkBoxes) {
 				if (checkBox.isSelected()) {
-					QuickFolderAccess.removeFolder(checkBox.getText());
+					namesList.add(checkBox.getText());
 				}
 			}
+			QuickFolderAccess.removeMultipleFolders(namesList);
 			JOptionPane.showMessageDialog(RemoveFolderForm.this, "Selected Folders Removed");
+			dispose();
 		});
-
-
-
-		// Add the panel to the frame
-
-
-		panel.add(checkBox);
+		panel.add(submitButton);
 
 		// Center the frame on the screen
 		setLocationRelativeTo(null);
@@ -76,21 +52,4 @@ public class RemoveFolderForm extends JFrame {
 		setVisible(true);
 	}
 
-	private JButton getFileDialogJButton(JTextField folderTextField) {
-		JButton browseButton = new JButton("Browse");
-
-		browseButton.addActionListener(e -> {
-			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-			int result = fileChooser.showOpenDialog(RemoveFolderForm.this);
-
-			if (result == JFileChooser.APPROVE_OPTION) {
-				String selectedFolder = fileChooser.getSelectedFile().getAbsolutePath();
-				folderTextField.setText(selectedFolder);
-			}
-		});
-
-		return browseButton;
-	}
 }

@@ -10,6 +10,8 @@ import java.util.Map;
 public class QuickFolderAccess {
 	private static final String CONFIG_PATH = "C:\\Users\\Alfredo\\Desktop\\test.ser";
 	private static final String IMAGE_PATH = "icon.png";
+	public static final String NO_FOLDER_ADDED = "No Folders Added";
+
 	private static final Image image = Toolkit.getDefaultToolkit().getImage(IMAGE_PATH);
 	private static SerializedConfigs config = new SerializedConfigs();
 	private static SystemTray tray = SystemTray.getSystemTray();
@@ -85,31 +87,50 @@ public class QuickFolderAccess {
 	}
 
 	/**
+	 * Remove folder from the right click popup menu.
+	 * @param folderName Name of the folder.
+	 */
+	private static void removeFromPopup(String folderName) {
+		boolean isNoFoldersAdded = folderName.equals(NO_FOLDER_ADDED);
+
+		for (int i = 0; i < popup.getItemCount(); i++) {
+			MenuItem menuItem = popup.getItem(i);
+			if (menuItem.getLabel().equalsIgnoreCase(folderName)) {
+				popup.remove(menuItem);
+				config.getFolders().remove(folderName);
+				break;
+			}
+		}
+
+		if (!isNoFoldersAdded && config.getFolders().isEmpty()) {
+			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
+			item.setEnabled(false);
+			popup.add(item);
+		}
+	}
+
+	/**
 	 * Add folder to the right click popup menu.
 	 * @param folderName Name of the folder.
 	 * @param folderPath Path of the folder.
 	 */
 	public static void addFolder(String folderName, String folderPath) {
-		popup.add(createMenuItem(folderName, folderPath));
+		if (config.getFolders().isEmpty()) {
+			removeFromPopup(NO_FOLDER_ADDED);
+		}
 
+		popup.add(createMenuItem(folderName, folderPath));
 		config.getFolders().put(folderName, folderPath);
 		saveConfig();
 	}
 
 	/**
-	 * Remove folder from the right click popup menu.
-	 * @param folderName Name of the folder.
+	 * Remove folders from the right click popup menu.
+	 * @param nameslist List of folder names.
 	 */
-	public static void removeFolder(String folderName) {
-		popup.remove(new MenuItem(folderName));
-		config.getFolders().remove(folderName);
-		saveConfig();
-	}
-
 	public static void removeMultipleFolders(List<String> nameslist) {
 		for (String folderName : nameslist) {
-			popup.remove(new MenuItem(folderName));
-			config.getFolders().remove(folderName);
+			removeFromPopup(folderName);
 		}
 		saveConfig();
 	}
@@ -118,6 +139,10 @@ public class QuickFolderAccess {
 	 * Add imported folders to the right click popup menu.
 	 */
 	private void addImportedFolders() {
+		if (!config.getFolders().entrySet().isEmpty()) {
+			removeFromPopup(NO_FOLDER_ADDED);
+		}
+
 		for (Map.Entry<String, String> folder : config.getFolders().entrySet()) {
 			popup.add(createMenuItem(folder.getKey(), folder.getValue()));
 		}
@@ -133,15 +158,21 @@ public class QuickFolderAccess {
 		exit.addActionListener(e -> System.exit(0));
 		popup.add(exit);
 
-		MenuItem addFolder = new MenuItem("Add Folder");
+		MenuItem addFolder = new MenuItem("Add Folder...");
 		addFolder.addActionListener(e -> new AddFolderForm("Add Folder"));
 		popup.add(addFolder);
 
-		MenuItem removeFolder = new MenuItem("Remove Folder");
+		MenuItem removeFolder = new MenuItem("Remove Folder...");
 		removeFolder.addActionListener(e -> new RemoveFolderForm("Remove Folder"));
 		popup.add(removeFolder);
 
 		popup.addSeparator();
+
+		if (config.getFolders().isEmpty()) {
+			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
+			item.setEnabled(false);
+			popup.add(item);
+		}
 
 		addImportedFolders();
 	}

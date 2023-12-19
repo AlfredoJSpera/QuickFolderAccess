@@ -24,6 +24,8 @@ public class QuickFolderAccess {
 	private static SystemTray tray = SystemTray.getSystemTray();
 	private static TrayIcon trayIcon = null;
 	private static PopupMenu popup = new PopupMenu();
+	private static MenuItem removeFolder;
+	private static MenuItem setFavoriteFolder;
 
 	public QuickFolderAccess() {
 		// Check if system tray is supported
@@ -113,6 +115,8 @@ public class QuickFolderAccess {
 			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
 			item.setEnabled(false);
 			popup.add(item);
+			removeFolder.setEnabled(false);
+			setFavoriteFolder.setEnabled(false);
 		}
 	}
 
@@ -124,6 +128,8 @@ public class QuickFolderAccess {
 	public static void addFolder(String folderName, String folderPath) {
 		if (config.getFolders().isEmpty()) {
 			removeFromPopup(NO_FOLDER_ADDED);
+			removeFolder.setEnabled(true);
+			setFavoriteFolder.setEnabled(true);
 		}
 
 		popup.add(createMenuItem(folderName, folderPath));
@@ -172,11 +178,11 @@ public class QuickFolderAccess {
 		addFolder.addActionListener(e -> new AddFolderForm("Add a Folder"));
 		popup.add(addFolder);
 
-		MenuItem removeFolder = new MenuItem(REMOVE_FOLDER);
+		removeFolder = new MenuItem(REMOVE_FOLDER);
 		removeFolder.addActionListener(e -> new RemoveFolderForm("Remove a Folder"));
 		popup.add(removeFolder);
 
-		MenuItem setFavoriteFolder = new MenuItem(SET_FAVORITE_FOLDER);
+		setFavoriteFolder = new MenuItem(SET_FAVORITE_FOLDER);
 		setFavoriteFolder.addActionListener(e -> new FavoriteFolderForm("Set a Favorite Folder"));
 		popup.add(setFavoriteFolder);
 
@@ -186,6 +192,8 @@ public class QuickFolderAccess {
 			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
 			item.setEnabled(false);
 			popup.add(item);
+			removeFolder.setEnabled(false);
+			setFavoriteFolder.setEnabled(false);
 		}
 
 		addImportedFolders();

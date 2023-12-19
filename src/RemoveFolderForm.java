@@ -9,7 +9,7 @@ public class RemoveFolderForm extends JFrame {
 	private static final String[] NAMES_TO_AVOID = {
 			QuickFolderAccess.EXIT, QuickFolderAccess.ADD_FOLDER,
 			QuickFolderAccess.REMOVE_FOLDER, QuickFolderAccess.SEPARATOR,
-			QuickFolderAccess.NO_FOLDER_ADDED
+			QuickFolderAccess.NO_FOLDER_ADDED, QuickFolderAccess.SET_FAVORITE_FOLDER
 	};
 
 	public RemoveFolderForm(String name) {

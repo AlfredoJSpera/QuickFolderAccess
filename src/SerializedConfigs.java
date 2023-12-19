@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -8,7 +9,7 @@ public class SerializedConfigs implements Serializable {
 	private static final long serialVersionUID = 5089920150690765457L;
 
 	private Map<String, String> folders;
-	//private File favoriteFolder = null;
+	private File favoriteFolder = null;
 
 	public SerializedConfigs() {
 		this.folders = new HashMap<>();
@@ -16,6 +17,11 @@ public class SerializedConfigs implements Serializable {
 
 	public SerializedConfigs(Map<String, String> folders) {
 		this.folders = folders;
+	}
+
+	public SerializedConfigs(Map<String, String> folders, File favoriteFolder) {
+		this.folders = folders;
+		this.favoriteFolder = favoriteFolder;
 	}
 
 	public Map<String, String> getFolders() {
@@ -26,8 +32,19 @@ public class SerializedConfigs implements Serializable {
 		this.folders = folders;
 	}
 
+	public File getFavoriteFolder() {
+		return favoriteFolder;
+	}
+
+	public void setFavoriteFolder(File favoriteFolder) {
+		this.favoriteFolder = favoriteFolder;
+	}
+
 	@Override
 	public String toString() {
-		return "SerializedConfigs{" + folders + '}';
+		return "SerializedConfigs{" +
+				"folders=" + folders +
+				", favoriteFolder=" + favoriteFolder +
+				'}';
 	}
 }

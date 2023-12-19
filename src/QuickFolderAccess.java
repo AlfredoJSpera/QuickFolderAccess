@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -10,7 +12,13 @@ import java.util.Map;
 public class QuickFolderAccess {
 	private static final String CONFIG_PATH = "C:\\Users\\Alfredo\\Desktop\\test.ser";
 	private static final String IMAGE_PATH = "icon.png";
+
 	public static final String NO_FOLDER_ADDED = "No Folders Added";
+	public static final String EXIT = "Exit";
+	public static final String ADD_FOLDER = "Add Folder...";
+	public static final String REMOVE_FOLDER = "Remove Folder...";
+	public static final String SEPARATOR = "-";
+	public static final String SET_FAVORITE_FOLDER = "Set Favorite Folder...";
 
 	private static final Image image = Toolkit.getDefaultToolkit().getImage(IMAGE_PATH);
 	private static SerializedConfigs config = new SerializedConfigs();
@@ -87,7 +95,7 @@ public class QuickFolderAccess {
 	}
 
 	/**
-	 * Remove folder from the right click popup menu.
+	 * FOR INTERNAL USE ONLY. Remove folder from the right click popup menu.
 	 * @param folderName Name of the folder.
 	 */
 	private static void removeFromPopup(String folderName) {
@@ -154,17 +162,21 @@ public class QuickFolderAccess {
 	private void initializePopupMenu() {
 		popup = new PopupMenu();
 
-		MenuItem exit = new MenuItem("Exit");
+		MenuItem exit = new MenuItem(EXIT);
 		exit.addActionListener(e -> System.exit(0));
 		popup.add(exit);
 
-		MenuItem addFolder = new MenuItem("Add Folder...");
-		addFolder.addActionListener(e -> new AddFolderForm("Add Folder"));
+		MenuItem addFolder = new MenuItem(ADD_FOLDER);
+		addFolder.addActionListener(e -> new AddFolderForm("Add a Folder"));
 		popup.add(addFolder);
 
-		MenuItem removeFolder = new MenuItem("Remove Folder...");
-		removeFolder.addActionListener(e -> new RemoveFolderForm("Remove Folder"));
+		MenuItem removeFolder = new MenuItem(REMOVE_FOLDER);
+		removeFolder.addActionListener(e -> new RemoveFolderForm("Remove a Folder"));
 		popup.add(removeFolder);
+
+		MenuItem setFavoriteFolder = new MenuItem(SET_FAVORITE_FOLDER);
+		setFavoriteFolder.addActionListener(e -> new FavoriteFolderForm("Set a Favorite Folder"));
+		popup.add(setFavoriteFolder);
 
 		popup.addSeparator();
 
@@ -177,14 +189,21 @@ public class QuickFolderAccess {
 		addImportedFolders();
 	}
 
-	private void setFavoriteFolder(String folderPath) {
+	public static void setFavoriteFolder(String name) {
+		trayIcon.setToolTip("Open " + name);
+
+		MouseListener[] mouseListeners = trayIcon.getMouseListeners();
+		for (MouseListener mouseListener : mouseListeners) {
+			trayIcon.removeMouseListener(mouseListener);
+		}
+
 		trayIcon.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) { // Check for double-click
 					try {
-						Desktop.getDesktop().open(new java.io.File(folderPath));
+						Desktop.getDesktop().open(new File(config.getFolders().get(name)));
 					} catch (Exception ex) {
-						System.err.println(ex.getMessage());
+						showErrorDialog(ex.getMessage());
 					}
 				}
 			}

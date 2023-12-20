@@ -34,17 +34,12 @@ public class QuickFolderAccess {
 			System.exit(1);
 		}
 
-		// Get the config file
 		try {
+			// Get the config file
 			getConfigFile();
 		} catch (IOException | ClassNotFoundException e) {
 			showErrorDialog(e.toString());
 			System.exit(1);
-		}
-
-		// If there are no folders, open the form and ask for at least one folder
-		if (config.getFolders().isEmpty()) {
-			new AddFolderForm("Set at least a folder");
 		}
 
 		// Add default folders
@@ -54,13 +49,23 @@ public class QuickFolderAccess {
 				popup
 		);
 		trayIcon.setImageAutoSize(true);
+
 		initializePopupMenu();
 
 		try {
+			// Add the tray icon to the system tray
 			tray.add(trayIcon);
 		} catch (AWTException e) {
 			showErrorDialog(e.toString());
 		}
+	}
+
+	/**
+	 * Show error message dialog.
+	 */
+	private static void showErrorDialog(String message) {
+		JOptionPane.showMessageDialog(null, message, "QuickFolderAccess: Error", JOptionPane.ERROR_MESSAGE);
+		System.err.println("[Error] => " + message);
 	}
 
 	/**
@@ -70,9 +75,128 @@ public class QuickFolderAccess {
 		File configFile = new File(CONFIG_PATH);
 
 		if (!configFile.exists()) {
+			// Create the config file if it doesn't exist
 			ObjectSerializer.serialize(CONFIG_PATH, config);
 		} else {
 			config = ObjectSerializer.deserialize(CONFIG_PATH, SerializedConfigs.class);
+		}
+	}
+
+	/**
+	 * Adds the default voices: Exit, Add Folder, Remove Folder, Set Favorite Folder, Separator.
+	 * Optionally a No Folders Added voice.
+	 */
+	private void initializePopupMenu() {
+		// EXIT
+		MenuItem exit = new MenuItem(EXIT);
+		exit.addActionListener(e -> System.exit(0));
+		popup.add(exit);
+
+		// ADD FOLDER
+		MenuItem addFolder = new MenuItem(ADD_FOLDER);
+		addFolder.addActionListener(e -> new AddFolderForm("Add a Folder"));
+		popup.add(addFolder);
+
+		// REMOVE FOLDER
+		removeFolder = new MenuItem(REMOVE_FOLDER);
+		removeFolder.addActionListener(e -> new RemoveFolderForm("Remove a Folder"));
+		popup.add(removeFolder);
+
+		// SET FAVORITE FOLDER
+		setFavoriteFolder = new MenuItem(SET_FAVORITE_FOLDER);
+		setFavoriteFolder.addActionListener(e -> new FavoriteFolderForm("Set a Favorite Folder"));
+		popup.add(setFavoriteFolder);
+
+		// SEPARATOR
+		popup.addSeparator();
+
+		// NO FOLDERS ADDED, if there are no folders
+		if (config.getFolders().isEmpty()) {
+			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
+			item.setEnabled(false);
+			popup.add(item);
+
+			// Disable the "Remove Folder" and "Set Favorite Folder" voices
+			removeFolder.setEnabled(false);
+			setFavoriteFolder.setEnabled(false);
+
+			// open the form and ask for at least one folder
+			new AddFolderForm("Set at least a folder");
+		} else {
+			// Add the imported folders to the popup menu
+			addImportedFolders();
+		}
+	}
+
+	/**
+	 * Add imported folders to the right click popup menu.
+	 */
+	private void addImportedFolders() {
+		// Remove the "No Folders Added" item if it's present
+		removeFromPopup(NO_FOLDER_ADDED);
+
+		// Add the imported folders to the popup menu
+		for (Map.Entry<String, String> folder : config.getFolders().entrySet()) {
+			popup.add(createMenuItem(folder.getKey(), folder.getValue()));
+		}
+
+		// Set the favorite folder if it's present
+		String favoriteFolderName = config.getFavoriteFolderName();
+		if (favoriteFolderName != null) {
+			setFavoriteFolder(favoriteFolderName);
+		}
+	}
+
+	/**
+	 * FOR INTERNAL USE ONLY. Remove folder from the right click popup menu.
+	 * @param folderName Name of the folder.
+	 */
+	private static void removeFromPopup(String folderName) {
+		boolean isNoFoldersAdded = folderName.equals(NO_FOLDER_ADDED);
+
+		// Remove the selected folder
+		for (int i = 0; i < popup.getItemCount(); i++) {
+			MenuItem menuItem = popup.getItem(i);
+
+			// If the folder is the selected folder, remove it
+			if (menuItem.getLabel().equals(folderName)) {
+				popup.remove(menuItem);
+				config.getFolders().remove(folderName);
+
+				// If the folder is the favorite folder, change the favorite folder to null
+				if (folderName.equals(config.getFavoriteFolderName())) {
+					config.setFavoriteFolderName(null);
+					trayIcon.setToolTip("Open a Folder");
+					for (MouseListener mouseListener : trayIcon.getMouseListeners()) {
+						trayIcon.removeMouseListener(mouseListener);
+					}
+				}
+
+				saveConfig();
+				break;
+			}
+		}
+
+		// If there are no folders left, add the "No Folders Added" item
+		if (!isNoFoldersAdded && config.getFolders().isEmpty()) {
+			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
+			item.setEnabled(false);
+			popup.add(item);
+
+			// Disable the "Remove Folder" and "Set Favorite Folder" voices
+			removeFolder.setEnabled(false);
+			setFavoriteFolder.setEnabled(false);
+		}
+	}
+
+	/**
+	 * Save the config file.
+	 */
+	private static void saveConfig() {
+		try {
+			ObjectSerializer.serialize(CONFIG_PATH, config);
+		} catch (IOException e) {
+			showErrorDialog(e.toString());
 		}
 	}
 
@@ -86,41 +210,14 @@ public class QuickFolderAccess {
 
 		item.addActionListener(e -> {
 			try {
-				Desktop.getDesktop().open(new java.io.File(folderPath));
+				// Open the specified folder
+				Desktop.getDesktop().open(new File(folderPath));
 			} catch (Exception ex) {
-				System.err.println(ex.getMessage());
+				showErrorDialog(ex.toString());
 			}
 		});
 
 		return item;
-	}
-
-	/**
-	 * FOR INTERNAL USE ONLY. Remove folder from the right click popup menu.
-	 * @param folderName Name of the folder.
-	 */
-	private static void removeFromPopup(String folderName) {
-		boolean isNoFoldersAdded = folderName.equals(NO_FOLDER_ADDED);
-
-		for (int i = 0; i < popup.getItemCount(); i++) {
-			MenuItem menuItem = popup.getItem(i);
-			if (menuItem.getLabel().equalsIgnoreCase(folderName)) {
-				popup.remove(menuItem);
-				config.getFolders().remove(folderName);
-				config.setFavoriteFolderName(null);
-				trayIcon.setToolTip("Open a Folder");
-				saveConfig();
-				break;
-			}
-		}
-
-		if (!isNoFoldersAdded && config.getFolders().isEmpty()) {
-			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
-			item.setEnabled(false);
-			popup.add(item);
-			removeFolder.setEnabled(false);
-			setFavoriteFolder.setEnabled(false);
-		}
 	}
 
 	/**
@@ -129,8 +226,11 @@ public class QuickFolderAccess {
 	 * @param folderPath Path of the folder.
 	 */
 	public static void addFolder(String folderName, String folderPath) {
+		// Remove the "No Folders Added" item if it's present
 		if (config.getFolders().isEmpty()) {
 			removeFromPopup(NO_FOLDER_ADDED);
+
+			// Enable the "Remove Folder" and "Set Favorite Folder" voices
 			removeFolder.setEnabled(true);
 			setFavoriteFolder.setEnabled(true);
 		}
@@ -148,72 +248,28 @@ public class QuickFolderAccess {
 		for (String folderName : nameslist) {
 			removeFromPopup(folderName);
 		}
-		saveConfig();
 	}
 
 	/**
-	 * Add imported folders to the right click popup menu.
+	 * Set a favorite folder.
+	 * @param name Name of the folder.
 	 */
-	private void addImportedFolders() {
-		if (!config.getFolders().entrySet().isEmpty()) {
-			removeFromPopup(NO_FOLDER_ADDED);
-		}
-
-		for (Map.Entry<String, String> folder : config.getFolders().entrySet()) {
-			popup.add(createMenuItem(folder.getKey(), folder.getValue()));
-		}
-
-		String favoriteFolderName = config.getFavoriteFolderName();
-		if (favoriteFolderName != null) {
-			setFavoriteFolder(favoriteFolderName);
-		}
-	}
-
-	/**
-	 * Create right click popup menu.
-	 */
-	private void initializePopupMenu() {
-		MenuItem exit = new MenuItem(EXIT);
-		exit.addActionListener(e -> System.exit(0));
-		popup.add(exit);
-
-		MenuItem addFolder = new MenuItem(ADD_FOLDER);
-		addFolder.addActionListener(e -> new AddFolderForm("Add a Folder"));
-		popup.add(addFolder);
-
-		removeFolder = new MenuItem(REMOVE_FOLDER);
-		removeFolder.addActionListener(e -> new RemoveFolderForm("Remove a Folder"));
-		popup.add(removeFolder);
-
-		setFavoriteFolder = new MenuItem(SET_FAVORITE_FOLDER);
-		setFavoriteFolder.addActionListener(e -> new FavoriteFolderForm("Set a Favorite Folder"));
-		popup.add(setFavoriteFolder);
-
-		popup.addSeparator();
-
-		if (config.getFolders().isEmpty()) {
-			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
-			item.setEnabled(false);
-			popup.add(item);
-			removeFolder.setEnabled(false);
-			setFavoriteFolder.setEnabled(false);
-		}
-
-		addImportedFolders();
-	}
-
 	public static void setFavoriteFolder(String name) {
+		// Remove the old mouse listeners
 		for (MouseListener mouseListener : trayIcon.getMouseListeners()) {
 			trayIcon.removeMouseListener(mouseListener);
 		}
 
+		// Add the new mouse listener
 		trayIcon.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) { // Check for double-click
+				// Check for double-click
+				if (e.getClickCount() == 2) {
 					try {
+						// Open the favorite folder
 						Desktop.getDesktop().open(new File(config.getFolders().get(name)));
 					} catch (Exception ex) {
-						showErrorDialog(ex.getMessage());
+						showErrorDialog(ex.toString());
 					}
 				}
 			}
@@ -225,24 +281,8 @@ public class QuickFolderAccess {
 	}
 
 	/**
-	 * Show error message dialog.
+	 * Get the popup menu.
 	 */
-	private static void showErrorDialog(String message) {
-		JOptionPane.showMessageDialog(null, message, "QuickFolderAccess: Error", JOptionPane.ERROR_MESSAGE);
-		System.err.println("[Error] => " + message);
-	}
-
-	/**
-	 * Save config file.
-	 */
-	private static void saveConfig() {
-		try {
-			ObjectSerializer.serialize(CONFIG_PATH, config);
-		} catch (IOException e) {
-			showErrorDialog(e.toString());
-		}
-	}
-
 	public static PopupMenu getPopup() {
 		return popup;
 	}

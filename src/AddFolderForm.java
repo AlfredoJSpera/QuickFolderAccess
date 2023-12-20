@@ -14,11 +14,18 @@ public class AddFolderForm extends JFrame {
 		JTextField folderTextField = new JTextField(20);
 		folderTextField.setEditable(false);
 
+		JCheckBox setAsFavoriteCheckBox = new JCheckBox("Set as Favorite");
+
 		JButton submitButton = new JButton("Add");
 		submitButton.setEnabled(false);
 		submitButton.addActionListener(e -> {
 			File selectedFolder = new File(folderTextField.getText());
 			QuickFolderAccess.addFolder(selectedFolder.getName(), selectedFolder.getAbsolutePath());
+
+			if (setAsFavoriteCheckBox.isSelected()) {
+				QuickFolderAccess.setFavoriteFolder(selectedFolder.getName());
+			}
+
 			JOptionPane.showMessageDialog(AddFolderForm.this, "Selected Folder: " + selectedFolder.getAbsolutePath());
 		});
 
@@ -27,6 +34,7 @@ public class AddFolderForm extends JFrame {
 		panel.add(label);
 		panel.add(folderTextField);
 		panel.add(browseButton);
+		panel.add(setAsFavoriteCheckBox);
 		panel.add(submitButton);
 
 		add(panel);

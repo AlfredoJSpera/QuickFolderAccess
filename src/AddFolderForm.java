@@ -11,8 +11,7 @@ public class AddFolderForm extends JFrame {
 	public AddFolderForm(String title) {
 		this.setTitle(title);
 		this.setContentPane(mainPanel);
-		this.pack();
-		setLocationRelativeTo(null);
+		this.setLocationRelativeTo(null);
 
 		addFolderButton.setEnabled(false);
 		addFolderButton.addActionListener(e -> {
@@ -40,6 +39,7 @@ public class AddFolderForm extends JFrame {
 			}
 		});
 
+		this.pack();
 		this.setVisible(true);
 	}
 }

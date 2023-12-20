@@ -8,25 +8,19 @@ import java.util.List;
 
 public class RemoveFolderForm extends JFrame {
 	private JPanel mainPanel;
-	private JPanel chkbxsContainer;
+	private JPanel checksMainContainer;
 	private JButton removeButton;
-
-	private static final String[] NAMES_TO_AVOID = {
-			QuickFolderAccess.EXIT, QuickFolderAccess.ADD_FOLDER,
-			QuickFolderAccess.REMOVE_FOLDER, QuickFolderAccess.SEPARATOR,
-			QuickFolderAccess.NO_FOLDER_ADDED, QuickFolderAccess.SET_FAVORITE_FOLDER
-	};
 
 	public RemoveFolderForm(String title) {
 		this.setTitle(title);
 		this.setContentPane(mainPanel);
-		setLocationRelativeTo(null);
+		this.setLocationRelativeTo(null);
 
 		removeButton.setEnabled(false);
 
 		JPanel checkBoxesPanel = new JPanel();
 		checkBoxesPanel.setLayout(new BoxLayout(checkBoxesPanel, BoxLayout.Y_AXIS));
-		chkbxsContainer.add(checkBoxesPanel);
+		checksMainContainer.add(checkBoxesPanel);
 
 		List<JCheckBox> checkBoxes = new ArrayList<>();
 		PopupMenu popup = QuickFolderAccess.getPopup();
@@ -34,7 +28,7 @@ public class RemoveFolderForm extends JFrame {
 		for (int i = 0; i < popup.getItemCount(); i++) {
 			MenuItem menuItem = popup.getItem(i);
 
-			if (!Arrays.asList(NAMES_TO_AVOID).contains(menuItem.getLabel())) {
+			if (!Arrays.asList(QuickFolderAccess.NAMES_TO_AVOID).contains(menuItem.getLabel())) {
 				JCheckBox checkBox = new JCheckBox(menuItem.getLabel());
 				checkBox.addMouseListener(new MouseAdapter() {
 					@Override

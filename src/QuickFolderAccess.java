@@ -21,6 +21,12 @@ public class QuickFolderAccess {
 	public static final String SEPARATOR = "-";
 	public static final String SET_FAVORITE_FOLDER = "Set Favorite Folder...";
 
+	public static final String[] NAMES_TO_AVOID = {
+			QuickFolderAccess.EXIT, QuickFolderAccess.ADD_FOLDER,
+			QuickFolderAccess.REMOVE_FOLDER, QuickFolderAccess.SEPARATOR,
+			QuickFolderAccess.NO_FOLDER_ADDED, QuickFolderAccess.SET_FAVORITE_FOLDER
+	};
+
 	private static final Image image = Toolkit.getDefaultToolkit().getImage(IMAGE_PATH);
 	private static SerializedConfigs config = new SerializedConfigs();
 	private static SystemTray tray = SystemTray.getSystemTray();
@@ -305,5 +311,9 @@ public class QuickFolderAccess {
 	 */
 	public static PopupMenu getPopup() {
 		return popup;
+	}
+
+	public static SerializedConfigs getConfig() {
+		return config;
 	}
 }

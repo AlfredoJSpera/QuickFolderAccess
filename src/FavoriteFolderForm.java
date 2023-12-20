@@ -1,45 +1,66 @@
 import javax.swing.*;
-
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class FavoriteFolderForm extends JFrame {
-	private static final String[] NAMES_TO_AVOID = {
-			QuickFolderAccess.EXIT, QuickFolderAccess.ADD_FOLDER,
-			QuickFolderAccess.REMOVE_FOLDER, QuickFolderAccess.SEPARATOR,
-			QuickFolderAccess.NO_FOLDER_ADDED, QuickFolderAccess.SET_FAVORITE_FOLDER
-	};
+	private JPanel mainPanel;
+	private JPanel radiosMainContainer;
+	private JButton setAsFavoriteButton;
 
-	public FavoriteFolderForm(String name) {
-		setTitle(name);
-		setSize(400, 300);
+	public FavoriteFolderForm(String title) {
+		this.setTitle(title);
+		this.setContentPane(mainPanel);
+		this.setLocationRelativeTo(null);
 
-		JPanel panel = new JPanel();
-		add(panel);
+		setAsFavoriteButton.setEnabled(false);
 
-		JLabel label = new JLabel("Select a folder to set as favorite:");
-		panel.add(label);
+		JPanel radioButtonsPanel = new JPanel();
+		radioButtonsPanel.setLayout(new BoxLayout(radioButtonsPanel, BoxLayout.Y_AXIS));
+		radiosMainContainer.add(radioButtonsPanel);
 
 		ButtonGroup buttonGroup = new ButtonGroup();
-
 		List<JRadioButton> radioButtons = new ArrayList<>();
 		PopupMenu popup = QuickFolderAccess.getPopup();
+
+		String currentFavorite = QuickFolderAccess.getConfig().getFavoriteFolderName();
+		boolean favoriteSet = false;
 
 		for (int i = 0; i < popup.getItemCount(); i++) {
 			MenuItem menuItem = popup.getItem(i);
 
-			if (!Arrays.asList(NAMES_TO_AVOID).contains(menuItem.getLabel())) {
+			if (!Arrays.asList(QuickFolderAccess.NAMES_TO_AVOID).contains(menuItem.getLabel())) {
 				JRadioButton radioButton = new JRadioButton(menuItem.getLabel());
+
+				if (!favoriteSet && currentFavorite != null && menuItem.getLabel().equals(currentFavorite)) {
+					radioButton.setSelected(true);
+					favoriteSet = true;
+				}
+
+				radioButton.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						for (JRadioButton radioButton : radioButtons) {
+							if (radioButton.getText().equals(currentFavorite)) {
+								setAsFavoriteButton.setEnabled(false);
+							} else if (radioButton.isSelected()) {
+								setAsFavoriteButton.setEnabled(true);
+								break;
+							}
+						}
+					}
+				});
+
 				buttonGroup.add(radioButton);
 				radioButtons.add(radioButton);
-				panel.add(radioButton);
+				radioButtonsPanel.add(radioButton);
 			}
 		}
 
-		JButton submitButton = new JButton("Set as Favorite");
-		submitButton.addActionListener(e -> {
+		setAsFavoriteButton.addActionListener(e -> {
 			for (JRadioButton radioButton : radioButtons) {
 				if (radioButton.isSelected()) {
 					QuickFolderAccess.setFavoriteFolder(radioButton.getText());
@@ -49,13 +70,8 @@ public class FavoriteFolderForm extends JFrame {
 			}
 			dispose();
 		});
-		panel.add(submitButton);
 
-		// Center the frame on the screen
-		setLocationRelativeTo(null);
-
-		// Set the visibility of the JFrame
-		setVisible(true);
+		this.pack();
+		this.setVisible(true);
 	}
-
 }

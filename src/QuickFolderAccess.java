@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class QuickFolderAccess {
-	private static final String CONFIG_PATH = "C:\\Users\\Alfredo\\Desktop\\test.ser";
+	private static final String CONFIG_PATH = "test.ser";
 	private static final String IMAGE_PATH = "icon.png";
 
 	public static final String NO_FOLDER_ADDED = "No Folders Added";

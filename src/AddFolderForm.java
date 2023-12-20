@@ -2,23 +2,20 @@ import javax.swing.*;
 import java.io.File;
 
 public class AddFolderForm extends JFrame {
+	private JTextField folderTextField;
+	private JCheckBox setAsFavoriteCheckBox;
+	private JButton browseButton;
+	private JButton addFolderButton;
+	private JPanel mainPanel;
 
-	public AddFolderForm(String name) {
-		setTitle(name);
-		setSize(400, 300);
+	public AddFolderForm(String title) {
+		this.setTitle(title);
+		this.setContentPane(mainPanel);
+		this.pack();
+		setLocationRelativeTo(null);
 
-		JPanel panel = new JPanel();
-
-		JLabel label = new JLabel("Select a folder to add:");
-
-		JTextField folderTextField = new JTextField(20);
-		folderTextField.setEditable(false);
-
-		JCheckBox setAsFavoriteCheckBox = new JCheckBox("Set as Favorite");
-
-		JButton submitButton = new JButton("Add");
-		submitButton.setEnabled(false);
-		submitButton.addActionListener(e -> {
+		addFolderButton.setEnabled(false);
+		addFolderButton.addActionListener(e -> {
 			File selectedFolder = new File(folderTextField.getText());
 			QuickFolderAccess.addFolder(selectedFolder.getName(), selectedFolder.getAbsolutePath());
 
@@ -29,24 +26,6 @@ public class AddFolderForm extends JFrame {
 			JOptionPane.showMessageDialog(AddFolderForm.this, "Selected Folder: " + selectedFolder.getAbsolutePath());
 		});
 
-		JButton browseButton = getFileDialogJButton(folderTextField, submitButton);
-
-		panel.add(label);
-		panel.add(folderTextField);
-		panel.add(browseButton);
-		panel.add(setAsFavoriteCheckBox);
-		panel.add(submitButton);
-
-		add(panel);
-
-		setLocationRelativeTo(null);
-
-		setVisible(true);
-	}
-
-	private JButton getFileDialogJButton(JTextField folderTextField, JButton submitButton) {
-		JButton browseButton = new JButton("Browse");
-
 		browseButton.addActionListener(e -> {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -56,10 +35,10 @@ public class AddFolderForm extends JFrame {
 			if (result == JFileChooser.APPROVE_OPTION) {
 				String selectedFolder = fileChooser.getSelectedFile().getAbsolutePath();
 				folderTextField.setText(selectedFolder);
-				submitButton.setEnabled(true);
+				addFolderButton.setEnabled(true);
 			}
 		});
 
-		return browseButton;
+		this.setVisible(true);
 	}
 }

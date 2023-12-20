@@ -1,3 +1,5 @@
+import com.formdev.flatlaf.FlatDarkLaf;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -28,6 +30,13 @@ public class QuickFolderAccess {
 	private static MenuItem setFavoriteFolder;
 
 	public QuickFolderAccess() {
+		// Set flatlaf look and feel
+		try {
+			UIManager.setLookAndFeel(new FlatDarkLaf());
+		} catch (Exception e) {
+			showErrorDialog("Failed to initialize FlatLaf");
+		}
+
 		// Check if system tray is supported
 		if (!SystemTray.isSupported()) {
 			showErrorDialog("SystemTray is not supported");
@@ -226,6 +235,17 @@ public class QuickFolderAccess {
 	 * @param folderPath Path of the folder.
 	 */
 	public static void addFolder(String folderName, String folderPath) {
+		// Check if the folder is already present or if the name or path are blank
+		if (config.getFolders().containsKey(folderName)) {
+			System.err.println("[Error] => Folder already present");
+			return;
+		}
+
+		if (folderName.isBlank() || folderPath.isBlank()) {
+			System.err.println("[Error] => Folder name or path are blank");
+			return;
+		}
+
 		// Remove the "No Folders Added" item if it's present
 		if (config.getFolders().isEmpty()) {
 			removeFromPopup(NO_FOLDER_ADDED);

@@ -23,7 +23,8 @@ public class AddFolderForm extends JFrame {
 				QuickFolderAccess.setFavoriteFolder(selectedFolder.getName());
 			}
 
-			JOptionPane.showMessageDialog(AddFolderForm.this, "Selected Folder: " + selectedFolder.getAbsolutePath());
+			JOptionPane.showMessageDialog(AddFolderForm.this, "Folder Added: " + selectedFolder.getAbsolutePath());
+			dispose();
 		});
 
 		browseButton.addActionListener(e -> {

@@ -1,26 +1,32 @@
 import javax.swing.*;
-
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class RemoveFolderForm extends JFrame {
+	private JPanel mainPanel;
+	private JPanel chkbxsContainer;
+	private JButton removeButton;
+
 	private static final String[] NAMES_TO_AVOID = {
 			QuickFolderAccess.EXIT, QuickFolderAccess.ADD_FOLDER,
 			QuickFolderAccess.REMOVE_FOLDER, QuickFolderAccess.SEPARATOR,
 			QuickFolderAccess.NO_FOLDER_ADDED, QuickFolderAccess.SET_FAVORITE_FOLDER
 	};
 
-	public RemoveFolderForm(String name) {
-		setTitle(name);
-		setSize(400, 300);
+	public RemoveFolderForm(String title) {
+		this.setTitle(title);
+		this.setContentPane(mainPanel);
+		setLocationRelativeTo(null);
 
-		JPanel panel = new JPanel();
-		add(panel);
+		removeButton.setEnabled(false);
 
-		JLabel label = new JLabel("Select a folder to remove:");
-		panel.add(label);
+		JPanel checkBoxesPanel = new JPanel();
+		checkBoxesPanel.setLayout(new BoxLayout(checkBoxesPanel, BoxLayout.Y_AXIS));
+		chkbxsContainer.add(checkBoxesPanel);
 
 		List<JCheckBox> checkBoxes = new ArrayList<>();
 		PopupMenu popup = QuickFolderAccess.getPopup();
@@ -30,14 +36,21 @@ public class RemoveFolderForm extends JFrame {
 
 			if (!Arrays.asList(NAMES_TO_AVOID).contains(menuItem.getLabel())) {
 				JCheckBox checkBox = new JCheckBox(menuItem.getLabel());
+				checkBox.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						boolean atLeastOneSelected = checkBoxes.stream().anyMatch(JCheckBox::isSelected);
+						removeButton.setEnabled(atLeastOneSelected);
+					}
+				});
 				checkBoxes.add(checkBox);
-				panel.add(checkBox);
+				checkBoxesPanel.add(checkBox);
 			}
 		}
 
 		List<String> namesList = new ArrayList<>();
-		JButton submitButton = new JButton("Remove");
-		submitButton.addActionListener(e -> {
+
+		removeButton.addActionListener(e -> {
 			for (JCheckBox checkBox : checkBoxes) {
 				if (checkBox.isSelected()) {
 					namesList.add(checkBox.getText());
@@ -47,13 +60,8 @@ public class RemoveFolderForm extends JFrame {
 			JOptionPane.showMessageDialog(RemoveFolderForm.this, "Selected Folders Removed");
 			dispose();
 		});
-		panel.add(submitButton);
 
-		// Center the frame on the screen
-		setLocationRelativeTo(null);
-
-		// Set the visibility of the JFrame
-		setVisible(true);
+		this.pack();
+		this.setVisible(true);
 	}
-
 }

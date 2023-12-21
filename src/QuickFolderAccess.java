@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class QuickFolderAccess {
-	private static final String CONFIG_PATH = "test.ser";
+	private static final String CONFIG_PATH = "QFA_Configs.ser";
 	private static final String IMAGE_PATH = "icon.png";
 
 	public static final String NO_FOLDER_ADDED = "No Folders Added";
@@ -40,21 +40,19 @@ public class QuickFolderAccess {
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (Exception e) {
-			showErrorDialog("Failed to initialize FlatLaf");
+			showWarningDialog("Failed to initialize FlatLaf. Using default Java swing look and feel.");
 		}
 
 		// Check if system tray is supported
 		if (!SystemTray.isSupported()) {
-			showErrorDialog("SystemTray is not supported");
-			System.exit(1);
+			showFatalErrorDialog("SystemTray is not supported");
 		}
 
 		try {
 			// Get the config file
 			getConfigFile();
 		} catch (IOException | ClassNotFoundException e) {
-			showErrorDialog(e.toString());
-			System.exit(1);
+			showFatalErrorDialog(e.toString());
 		}
 
 		// Add default folders
@@ -71,16 +69,25 @@ public class QuickFolderAccess {
 			// Add the tray icon to the system tray
 			tray.add(trayIcon);
 		} catch (AWTException e) {
-			showErrorDialog(e.toString());
+			showFatalErrorDialog(e.toString());
 		}
 	}
 
 	/**
-	 * Show error message dialog.
+	 * Show error message dialog and exits the program.
 	 */
-	private static void showErrorDialog(String message) {
-		JOptionPane.showMessageDialog(null, message, "QuickFolderAccess: Error", JOptionPane.ERROR_MESSAGE);
-		System.err.println("[Error] => " + message);
+	private static void showFatalErrorDialog(String message) {
+		JOptionPane.showMessageDialog(null, message, "QuickFolderAccess: Fatal Error", JOptionPane.ERROR_MESSAGE);
+		System.err.println("\u001B[31m[Error] => " + message + "\u001B[0m");
+		System.exit(1);
+	}
+
+	/**
+	 * Show warning message dialog.
+	 */
+	private static void showWarningDialog(String message) {
+		JOptionPane.showMessageDialog(null, message, "QuickFolderAccess: Warning", JOptionPane.WARNING_MESSAGE);
+		System.err.println("\u001B[33m[Warning] => " + message + "\u001B[0m");
 	}
 
 	/**
@@ -211,7 +218,7 @@ public class QuickFolderAccess {
 		try {
 			ObjectSerializer.serialize(CONFIG_PATH, config);
 		} catch (IOException e) {
-			showErrorDialog(e.toString());
+			showFatalErrorDialog(e.toString());
 		}
 	}
 
@@ -228,7 +235,7 @@ public class QuickFolderAccess {
 				// Open the specified folder
 				Desktop.getDesktop().open(new File(folderPath));
 			} catch (Exception ex) {
-				showErrorDialog(ex.toString());
+				showFatalErrorDialog(ex.toString());
 			}
 		});
 
@@ -295,7 +302,7 @@ public class QuickFolderAccess {
 						// Open the favorite folder
 						Desktop.getDesktop().open(new File(config.getFolders().get(name)));
 					} catch (Exception ex) {
-						showErrorDialog(ex.toString());
+						showFatalErrorDialog(ex.toString());
 					}
 				}
 			}

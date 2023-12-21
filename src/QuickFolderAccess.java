@@ -13,21 +13,21 @@ import java.util.Map;
 public class QuickFolderAccess {
 	private static final String CONFIG_PATH = "QFA_Configs.ser";
 	private static final String IMAGE_PATH = "icon.png";
+	private static final Image image = Toolkit.getDefaultToolkit().getImage(IMAGE_PATH);
 
-	public static final String NO_FOLDER_ADDED = "No Folders Added";
-	public static final String EXIT = "Exit";
-	public static final String ADD_FOLDER = "Add Folder...";
-	public static final String REMOVE_FOLDER = "Remove Folder...";
-	public static final String SEPARATOR = "-";
-	public static final String SET_FAVORITE_FOLDER = "Set Favorite Folder...";
+	private static final String NO_FOLDER_ADDED = "No Folders Added";
+	private static final String EXIT = "Exit";
+	private static final String ADD_FOLDER = "Add Folder...";
+	private static final String REMOVE_FOLDER = "Remove Folder...";
+	private static final String SEPARATOR = "-";
+	private static final String SET_FAVORITE_FOLDER = "Set Favorite Folder...";
 
 	public static final String[] NAMES_TO_AVOID = {
-			QuickFolderAccess.EXIT, QuickFolderAccess.ADD_FOLDER,
-			QuickFolderAccess.REMOVE_FOLDER, QuickFolderAccess.SEPARATOR,
-			QuickFolderAccess.NO_FOLDER_ADDED, QuickFolderAccess.SET_FAVORITE_FOLDER
+			EXIT, ADD_FOLDER,
+			REMOVE_FOLDER, SEPARATOR,
+			NO_FOLDER_ADDED, SET_FAVORITE_FOLDER
 	};
 
-	private static final Image image = Toolkit.getDefaultToolkit().getImage(IMAGE_PATH);
 	private static SerializedConfigs config = new SerializedConfigs();
 	private static SystemTray tray = SystemTray.getSystemTray();
 	private static TrayIcon trayIcon = null;
@@ -132,7 +132,7 @@ public class QuickFolderAccess {
 		// SEPARATOR
 		popup.addSeparator();
 
-		// NO FOLDERS ADDED, if there are no folders
+		// NO FOLDERS ADDED, if there are no folders in the config file
 		if (config.getFolders().isEmpty()) {
 			MenuItem item = new MenuItem(NO_FOLDER_ADDED);
 			item.setEnabled(false);
@@ -142,10 +142,10 @@ public class QuickFolderAccess {
 			removeFolder.setEnabled(false);
 			setFavoriteFolder.setEnabled(false);
 
-			// open the form and ask for at least one folder
+			// Open the form and ask for at least one folder
 			new AddFolderForm("Set at least a folder");
 		} else {
-			// Add the imported folders to the popup menu
+			// Otherwise, add the imported folders to the popup menu
 			addImportedFolders();
 		}
 	}
@@ -159,7 +159,9 @@ public class QuickFolderAccess {
 
 		// Add the imported folders to the popup menu
 		for (Map.Entry<String, String> folder : config.getFolders().entrySet()) {
-			popup.add(createMenuItem(folder.getKey(), folder.getValue()));
+			popup.add(
+					createMenuItem(folder.getKey(), folder.getValue())
+			);
 		}
 
 		// Set the favorite folder if it's present

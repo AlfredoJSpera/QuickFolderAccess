@@ -36,7 +36,7 @@ QuickFolderAccess is a Java-based system tray application that provides quick ac
 
 ## Configuration
 
-- Configuration data is stored in the `QFA_Configs.ser` file.
+- Configuration data is stored in the `QFA_Configs.ser` file, in the same directory as the jar.
 - The application automatically creates the configuration file if it doesn't exist.
 
 ## Contributing

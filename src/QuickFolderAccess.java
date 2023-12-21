@@ -78,7 +78,7 @@ public class QuickFolderAccess {
 	 */
 	private static void showFatalErrorDialog(String message) {
 		JOptionPane.showMessageDialog(null, message, "QuickFolderAccess: Fatal Error", JOptionPane.ERROR_MESSAGE);
-		System.err.println("\u001B[31m[Error] => " + message + "\u001B[0m");
+		System.err.println("[Error] => " + message);
 		System.exit(1);
 	}
 
@@ -87,7 +87,7 @@ public class QuickFolderAccess {
 	 */
 	private static void showWarningDialog(String message) {
 		JOptionPane.showMessageDialog(null, message, "QuickFolderAccess: Warning", JOptionPane.WARNING_MESSAGE);
-		System.err.println("\u001B[33m[Warning] => " + message + "\u001B[0m");
+		System.err.println("[Warning] => " + message);
 	}
 
 	/**
@@ -173,22 +173,22 @@ public class QuickFolderAccess {
 
 	/**
 	 * FOR INTERNAL USE ONLY. Remove folder from the right click popup menu.
-	 * @param folderName Name of the folder.
+	 * @param name Name of the folder.
 	 */
-	private static void removeFromPopup(String folderName) {
-		boolean isNoFoldersAdded = folderName.equals(NO_FOLDER_ADDED);
+	private static void removeFromPopup(String name) {
+		boolean isNoFoldersAdded = name.equals(NO_FOLDER_ADDED);
 
 		// Remove the selected folder
 		for (int i = 0; i < popup.getItemCount(); i++) {
 			MenuItem menuItem = popup.getItem(i);
 
 			// If the folder is the selected folder, remove it
-			if (menuItem.getLabel().equals(folderName)) {
+			if (menuItem.getLabel().equals(name)) {
 				popup.remove(menuItem);
-				config.getFolders().remove(folderName);
+				config.getFolders().remove(name);
 
 				// If the folder is the favorite folder, change the favorite folder to null
-				if (folderName.equals(config.getFavoriteFolderName())) {
+				if (name.equals(config.getFavoriteFolderName())) {
 					config.setFavoriteFolderName(null);
 					trayIcon.setToolTip("Open a Folder");
 					for (MouseListener mouseListener : trayIcon.getMouseListeners()) {
@@ -226,16 +226,16 @@ public class QuickFolderAccess {
 
 	/**
 	 * Create right click menu item with the action listener.
-	 * @param folderName Name of the folder.
-	 * @param folderPath Path of the folder.
+	 * @param name Name of the folder.
+	 * @param path Path of the folder.
 	 */
-	private static MenuItem createMenuItem(String folderName, String folderPath) {
-		MenuItem item = new MenuItem(folderName);
+	private static MenuItem createMenuItem(String name, String path) {
+		MenuItem item = new MenuItem(name);
 
 		item.addActionListener(e -> {
 			try {
 				// Open the specified folder
-				Desktop.getDesktop().open(new File(folderPath));
+				Desktop.getDesktop().open(new File(path));
 			} catch (Exception ex) {
 				showFatalErrorDialog(ex.toString());
 			}
@@ -246,19 +246,19 @@ public class QuickFolderAccess {
 
 	/**
 	 * Add folder to the right click popup menu.
-	 * @param folderName Name of the folder.
-	 * @param folderPath Path of the folder.
+	 * @param name Name of the folder.
+	 * @param path Path of the folder.
 	 */
-	public static void addFolder(String folderName, String folderPath) {
+	public static void addFolder(String name, String path) throws IllegalArgumentException {
 		// Check if the folder is already present or if the name or path are blank
-		if (config.getFolders().containsKey(folderName)) {
-			System.err.println("[Error] => Folder already present");
-			return;
+		if (config.getFolders().containsKey(name)) {
+			System.err.println("[Error, IllegalArgumentException] => Folder " + name + " already exists");
+			throw new IllegalArgumentException("Folder " + name + " already exists");
 		}
 
-		if (folderName.isBlank() || folderPath.isBlank()) {
-			System.err.println("[Error] => Folder name or path are blank");
-			return;
+		if (name.isBlank() || path.isBlank()) {
+			System.err.println("[Error, IllegalArgumentException] => Folder name or path are blank");
+			throw new IllegalArgumentException("Folder name or path are blank");
 		}
 
 		// Remove the "No Folders Added" item if it's present
@@ -270,8 +270,8 @@ public class QuickFolderAccess {
 			setFavoriteFolder.setEnabled(true);
 		}
 
-		popup.add(createMenuItem(folderName, folderPath));
-		config.getFolders().put(folderName, folderPath);
+		popup.add(createMenuItem(name, path));
+		config.getFolders().put(name, path);
 		saveConfig();
 	}
 

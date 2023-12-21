@@ -16,7 +16,13 @@ public class AddFolderForm extends JFrame {
 		addFolderButton.setEnabled(false);
 		addFolderButton.addActionListener(e -> {
 			File selectedFolder = new File(folderTextField.getText());
-			QuickFolderAccess.addFolder(selectedFolder.getName(), selectedFolder.getAbsolutePath());
+
+			try {
+				QuickFolderAccess.addFolder(selectedFolder.getName(), selectedFolder.getAbsolutePath());
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(AddFolderForm.this, ex.getMessage());
+				return;
+			}
 
 			if (setAsFavoriteCheckBox.isSelected()) {
 				QuickFolderAccess.setFavoriteFolder(selectedFolder.getName());

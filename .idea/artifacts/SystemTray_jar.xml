@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SystemTray:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SystemTray_jar</output-path>
+    <root id="archive" name="SystemTray.jar">
+      <element id="module-output" name="SystemTray" />
+      <element id="library" level="project" name="JustSerialize" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/JustSerialize2.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/flatlaf-3.2.5.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

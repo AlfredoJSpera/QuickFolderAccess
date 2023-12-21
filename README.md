@@ -1,4 +1,6 @@
 # QuickFolderAccess
+[![Java Version](https://img.shields.io/badge/Java-19-blue.svg)](https://www.oracle.com/java/technologies/javase/19-relnotes.html)
+[![Operating System](https://img.shields.io/badge/OS-Windows-brightgreen.svg)](https://www.microsoft.com/en-us/windows)
 
 QuickFolderAccess is a Java-based system tray application that provides quick access to your favorite folders directly from the system tray on your Windows desktop.
 

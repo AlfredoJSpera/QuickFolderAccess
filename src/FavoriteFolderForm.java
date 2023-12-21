@@ -64,7 +64,8 @@ public class FavoriteFolderForm extends JFrame {
 			for (JRadioButton radioButton : radioButtons) {
 				if (radioButton.isSelected()) {
 					QuickFolderAccess.setFavoriteFolder(radioButton.getText());
-					JOptionPane.showMessageDialog(FavoriteFolderForm.this, "Selected Folder set as favorite");
+
+					JOptionPane.showMessageDialog(FavoriteFolderForm.this, "Folder set as favorite: " + radioButton.getText(), "QuickFolderAccess: Success", JOptionPane.INFORMATION_MESSAGE);
 					break;
 				}
 			}

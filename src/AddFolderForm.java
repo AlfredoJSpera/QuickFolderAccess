@@ -20,7 +20,7 @@ public class AddFolderForm extends JFrame {
 			try {
 				QuickFolderAccess.addFolder(selectedFolder.getName(), selectedFolder.getAbsolutePath());
 			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(AddFolderForm.this, ex.getMessage());
+				JOptionPane.showMessageDialog(AddFolderForm.this, ex.getMessage(), "QuickFolderAccess: Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
@@ -28,7 +28,7 @@ public class AddFolderForm extends JFrame {
 				QuickFolderAccess.setFavoriteFolder(selectedFolder.getName());
 			}
 
-			JOptionPane.showMessageDialog(AddFolderForm.this, "Folder Added: " + selectedFolder.getAbsolutePath());
+			JOptionPane.showMessageDialog(AddFolderForm.this, "Folder Added: " + selectedFolder.getAbsolutePath(), "QuickFolderAccess: Success", JOptionPane.INFORMATION_MESSAGE);
 			dispose();
 		});
 

@@ -51,7 +51,13 @@ public class RemoveFolderForm extends JFrame {
 				}
 			}
 			QuickFolderAccess.removeMultipleFolders(namesList);
-			JOptionPane.showMessageDialog(RemoveFolderForm.this, "Selected Folders Removed");
+
+			StringBuilder message = new StringBuilder("Folders Removed: ");
+			for (String s : namesList) {
+				message.append("\n- ").append(s);
+			}
+
+			JOptionPane.showMessageDialog(RemoveFolderForm.this, message, "QuickFolderAccess: Success", JOptionPane.INFORMATION_MESSAGE);
 			dispose();
 		});
 

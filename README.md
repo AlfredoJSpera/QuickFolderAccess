@@ -19,13 +19,13 @@ QuickFolderAccess is a Java-based system tray application that provides quick ac
 
 ### Installation
 
-1. [Download the zip file](https://github.com/AlfredoJSpera/QuickFolderAccess/releases)
+1. [Download the zip file](https://github.com/AlfredoJSpera/QuickFolderAccess/releases).
 
-2. Extract the zip file and put the folder where you want. Try to avoid system directories
+2. Extract the zip file and put the folder where you want (eg. User Home directory). Try to avoid system directories.
 3. To open the program at startup:
-   - Copy the jar file
-   - Open run (`Win` + `R`) and type `shell:startup`
-   - Paste the shortcut in the folder that opens
+   - Copy the jar file;
+   - Open run (`Win` + `R`) and type `shell:startup`;
+   - Paste the shortcut in the folder that opens.
 
 ## Usage
 

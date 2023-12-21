@@ -32,6 +32,7 @@ QuickFolderAccess is a Java-based system tray application that provides quick ac
 1. The application runs in the system tray after launching.
 2. Right-click on the system tray icon to access the menu.
 3. Add, remove, and set favorite folders using the provided menu options.
+4. Double Click to open the favorite folder.
 
 ## Configuration
 
